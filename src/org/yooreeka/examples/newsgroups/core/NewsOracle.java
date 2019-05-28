@@ -70,7 +70,7 @@ public class NewsOracle {
 
 		Directory dir = null;
 		try {
-			dir = FSDirectory.open(new File(indexDir));
+			dir = FSDirectory.open(new File(indexDir).toPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

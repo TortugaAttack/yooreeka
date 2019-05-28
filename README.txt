@@ -5,17 +5,15 @@ Quick start for running book examples on Windows platform
 ______________________________________________________________________________		
 1. Verify your environment
 
-        1.1  Make sure that you've placed all distribution files under a directory
+        1.1. Make sure that you've placed all distribution files under a directory
              on your filesystem, say, "C:\code\yooreeka" on a Windows OS or /code/yooreeka
              on a Linux OS. You can call that directory whatever you want.
-	     
-	1.2  Create a new environment variable YOOREEKA_HOME with the above directory as its value
              
-        1.3  Set the property yooreeka.home in the yooreeka.properties file, so that
+        1.2  Set the property yooreeka.home in the yooreeka.properties file, so that
              it points to the installation directory mentioned above. Make sure the rest 
              of the properties are consistently pointing to the appropriate locations. 
         
-        1.4  Start windows command line interpreter (cmd.exe) and confirm that you 
+        1.3. Start windows command line interpreter (cmd.exe) and confirm that you 
              can run java and ant from the command line on your system. 
         
              Within a Windows command prompt, execute the following:

@@ -43,7 +43,6 @@ import org.yooreeka.algos.taxis.core.intf.Classifier;
 import org.yooreeka.algos.taxis.core.intf.Concept;
 import org.yooreeka.algos.taxis.core.intf.Instance;
 import org.yooreeka.config.YooreekaConfigurator;
-import org.yooreeka.util.P;
 
 /**
  * A basic implementation of the Naive Bayes algorithm.
@@ -324,12 +323,5 @@ public class NaiveBayes implements Classifier {
 		}
 
 		attributeList.add(aName);
-	}
-
-	public void printConcepts() {
-		
-		for (Concept c: conceptPriors.keySet()) {
-			P.println(c.getName()+": "+getProbability(c));
-		}
 	}
 }

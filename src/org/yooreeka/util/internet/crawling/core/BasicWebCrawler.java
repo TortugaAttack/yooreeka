@@ -31,8 +31,8 @@
 package org.yooreeka.util.internet.crawling.core;
 
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.yooreeka.util.P;
 import org.yooreeka.util.internet.crawling.db.FetchedDocsDB;
 import org.yooreeka.util.internet.crawling.db.KnownUrlDB;
@@ -60,7 +60,7 @@ import org.yooreeka.util.parsing.common.ProcessedDocument;
  * future versions.
  * 
  * @author <a href="mailto:babis@marmanis.com">Babis Marmanis</a>
- *
+ * @deprecated
  * 
  */
 public class BasicWebCrawler {
@@ -76,6 +76,8 @@ public class BasicWebCrawler {
 	private long DEFAULT_PAUSE_IN_MILLIS = 500;
 	private long pauseBetweenFetchesInMillis = DEFAULT_PAUSE_IN_MILLIS;
 
+	private DocumentIdUtils docIdUtils = new DocumentIdUtils();
+	
 	/*
 	 * Number of URLs to fetch and parse at a time.
 	 */
@@ -101,7 +103,7 @@ public class BasicWebCrawler {
 
 	public void fetchAndProcess(int maxDepth, int maxDocs) {
 
-		log.fine("fetchAndProcess(int maxDepth:"+maxDepth+", int maxDocs"+maxDocs+")");
+		log.debug("fetchAndProcess(int maxDepth:"+maxDepth+", int maxDocs"+maxDocs+")");
 		
 		boolean maxUrlsLimitReached = false;
 		int documentGroup = 1;
@@ -195,7 +197,7 @@ public class BasicWebCrawler {
 				
 				for (String url : urlGroup.getUrls()) {
 					
-					log.fine("fetchPages with URL: "+url);
+					P.println("fetchPages with URL: "+url);
 					
 					try {
 						
@@ -203,11 +205,11 @@ public class BasicWebCrawler {
 					
 						if (doc.getContentType().endsWith(ProcessedDocument.TYPE_DIRECTORY)) {
 						
-							log.warning("Not saving information about directory: "+doc.getDocumentURL());
+							P.println("Not saving information about directory: "+doc.getDocumentURL());
 
 						} else {
 
-							String documentId = DocumentIdUtils.getDocumentId(groupId, docSequenceInGroup);
+							String documentId = docIdUtils.getDocumentId(groupId, docSequenceInGroup);
                             doc.setDocumentId(documentId);
                             fetchedDocsDB.saveDocument(doc);
 						}
@@ -217,11 +219,11 @@ public class BasicWebCrawler {
 						}
 					} catch (TransportException tX) {
 						//We failed to retrieve the document, log the fact and just skip that file
-						log.warning(tX.getMessage());
+						P.println(tX.getMessage());
 						
 					} catch (Exception e) {
 						e.printStackTrace();
-						log.warning("Failed to fetch document from url: '"
+						P.println("Failed to fetch document from url: '"
 										+ url + "'.\n" + e.getMessage());
 						crawlData.getKnownUrlsDB().updateUrlStatus(url,
 								KnownUrlEntry.STATUS_PROCESSED_ERROR);
@@ -269,7 +271,7 @@ public class BasicWebCrawler {
 		URLNormalizer urlNormalizer = new URLNormalizer();
 		if (urlFilter == null) {
 			urlFilter = new URLFilter();
-			log.warning("Using default URLFilter configuration that only accepts 'file://' urls");
+			P.println("Using default URLFilter configuration that only accepts 'file://' urls");
 		}
 
 		List<String> docIds = parsedDocs.getDocumentIds(groupId);
@@ -303,53 +305,54 @@ public class BasicWebCrawler {
 			
 //			try {
 				doc = fetchedDocsDB.getDocument(id);
-				
-				if (doc != null) {
-					String url = doc.getDocumentURL();
-	
-					if (!url.startsWith("http://goo.gl")) {
+				String url = doc.getDocumentURL();
 
-						String contentType = doc.getContentType();
-		
-//						 P.println("Now processing: "+url);
-//						 P.println("Content Type: "+contentType);
-//						 P.hline();
-						
-						 DocumentParser docParser = null;
-						 try {
-								
-							 docParser = DocumentParserFactory.getInstance().getDocumentParser(contentType);
-							
-						 } catch (DocumentParserException e) {
-								
-							 P.error(e.getLocalizedMessage());
-						 }
+				String contentType = doc.getContentType();
+
+				DocumentParser docParser = null;
+				try {
+					docParser = DocumentParserFactory.getInstance().getDocumentParser(contentType);
+				} catch (DocumentParserException e) {
 					
-						 ProcessedDocument parsedDoc = null;
-						 try {
-								
-							 parsedDoc = docParser.parse(doc);
-								
-						 } catch (DocumentParserException e) {
-			
-							 P.error(e.getLocalizedMessage());
-						 }
-			
-						 //DEBUG
-						 /*
-						 P.hline();
-						 P.println(parsedDoc.getContent().substring(0, 10000));
-						 P.hline();
-						 */
-						 
-						 parsedDocsService.saveDocument(parsedDoc);
-						 
-						 crawlData.getKnownUrlsDB().updateUrlStatus(url,	KnownUrlEntry.STATUS_PROCESSED_SUCCESS);
-						}
-					}
+					// DEBUG
+					P.println(docParser.toString());
+					P.println(doc.toString());
+
+					e.printStackTrace();
 				}
-			}
-		
+
+				ProcessedDocument parsedDoc = null;
+				try {
+					
+					parsedDoc = docParser.parse(doc);
+					
+				} catch (DocumentParserException e) {
+
+					// DEBUG
+					P.println(docParser.toString());
+					P.println(doc.toString());
+					
+					e.printStackTrace();
+				}
+
+				//DEBUG
+//				P.hline();
+//				P.println(parsedDoc.getContent().substring(0, 10000));
+//				P.hline();
+				
+				parsedDocsService.saveDocument(parsedDoc);
+
+//				if (doc.getContentType().equals(ProcessedDocument.TYPE_MSWORD)  ||
+//					doc.getContentType().equals(ProcessedDocument.TYPE_PDF)     ||
+//					doc.getContentType().equals(ProcessedDocument.TYPE_TEXT))    {
+//				
+//					String fixedUrl = FileTransport.FILE_URL_PREFIX+url;
+//					crawlData.getKnownUrlsDB().updateUrlStatus(fixedUrl, KnownUrlEntry.STATUS_PROCESSED_SUCCESS);
+//				} else {
+					crawlData.getKnownUrlsDB().updateUrlStatus(url,	KnownUrlEntry.STATUS_PROCESSED_SUCCESS);
+//				}
+		}
+	}
 
 	private List<String> selectNextBatchOfUrlsToCrawl(int maxBatchSize,
 			int depth) {

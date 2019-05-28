@@ -179,7 +179,7 @@ public class DocRankMatrixBuilder implements CrawlDataProcessor {
 	public void run() {
 		try {
 			DirectoryReader idxR = DirectoryReader.open(new SimpleFSDirectory(
-					new File(indexDir)));
+					new File(indexDir).toPath()));
 			matrixH = buildMatrixH(idxR);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while building matrix: ", e);

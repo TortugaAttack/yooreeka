@@ -188,46 +188,43 @@ public class HTTPTransport implements Transport {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		HttpEntity entity = response.getEntity();
+
+		P.hline();
+		P.println(response.getStatusLine().toString());
 		
-		if (response != null) {
-			HttpEntity entity = response.getEntity();
-	
-			P.hline();
-			P.println(response.getStatusLine().toString());
-			
-			if (entity != null) {
-				P.println("Response content length: "
-						+ entity.getContentLength());
-			}
-		
-			List<Cookie> cookies = cookieStore.getCookies();
-			for (int i = 0; i < cookies.size(); i++) {
-				P.println("Local cookie: " + cookies.get(i));
-			}
-	
+		if (entity != null) {
+			P.println("Response content length: "
+					+ entity.getContentLength());
+		}
+		List<Cookie> cookies = cookieStore.getCookies();
+		for (int i = 0; i < cookies.size(); i++) {
+			P.println("Local cookie: " + cookies.get(i));
+		}
+
+		try {
+			doc = createDocument(documentUrl, entity, groupId, docSequenceInGroup);
+		} catch (IOException e) {
+			throw new TransportException("Failed to fetch url: '" + documentUrl	+ "': ", e);
+		} finally {
+			// Consume response content
 			try {
-				doc = createDocument(documentUrl, entity, groupId, docSequenceInGroup);
+				EntityUtils.consume(entity);
 			} catch (IOException e) {
-				throw new TransportException("Failed to fetch url: '" + documentUrl	+ "': ", e);
-			} finally {
-				// Consume response content
-				try {
-					EntityUtils.consume(entity);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	
-				P.hline();
-	
-				// When HttpClient instance is no longer needed,
-				// shut down the connection manager to ensure
-				// immediate deallocation of all system resources
-				httpclient.getConnectionManager().shutdown();
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-	
-			db.saveDocument(doc);
-		}		
+
+			P.hline();
+
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			httpclient.getConnectionManager().shutdown();
+		}
+
+		db.saveDocument(doc);
+		
 		return doc;
 	}
 

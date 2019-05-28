@@ -99,7 +99,7 @@ public class UserStatisticsCalculator {
 			if (t.isFraud()) {
 				// do not use fraud transactions to calculate user statistics
 			} else {
-				nonFraudTxnCount = nonFraudTxnCount+1;
+				nonFraudTxnCount++;
 
 				descriptions.add(t.getDescription());
 

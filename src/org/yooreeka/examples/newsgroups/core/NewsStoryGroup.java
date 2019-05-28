@@ -6,10 +6,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 
 
 /**
@@ -120,55 +116,6 @@ public class NewsStoryGroup implements java.io.Serializable {
             public int compare(NewsStoryGroup f1, NewsStoryGroup f2) {
                 return f1.getClusterLabel().compareTo(f2.getClusterLabel());
             }
-
-			@Override
-			public Comparator<NewsStoryGroup> reversed() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparing(
-					Comparator<? super NewsStoryGroup> other) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <U> Comparator<NewsStoryGroup> thenComparing(
-					Function<? super NewsStoryGroup, ? extends U> keyExtractor,
-					Comparator<? super U> keyComparator) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <U extends Comparable<? super U>> Comparator<NewsStoryGroup> thenComparing(
-					Function<? super NewsStoryGroup, ? extends U> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingInt(
-					ToIntFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingLong(
-					ToLongFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingDouble(
-					ToDoubleFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
         });
     }
 
@@ -187,56 +134,6 @@ public class NewsStoryGroup implements java.io.Serializable {
             	}
                 return val;
             }
-
-			@Override
-			public Comparator<NewsStoryGroup> reversed() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparing(
-					Comparator<? super NewsStoryGroup> other) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <U> Comparator<NewsStoryGroup> thenComparing(
-					Function<? super NewsStoryGroup, ? extends U> keyExtractor,
-					Comparator<? super U> keyComparator) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public <U extends Comparable<? super U>> Comparator<NewsStoryGroup> thenComparing(
-					Function<? super NewsStoryGroup, ? extends U> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingInt(
-					ToIntFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingLong(
-					ToLongFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Comparator<NewsStoryGroup> thenComparingDouble(
-					ToDoubleFunction<? super NewsStoryGroup> keyExtractor) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
         });
     }
 

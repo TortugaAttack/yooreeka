@@ -31,9 +31,7 @@
 package org.yooreeka.algos.clustering.hierarchical;
 
 import org.yooreeka.algos.clustering.model.Cluster;
-import org.yooreeka.algos.clustering.model.ClusterSet;
 import org.yooreeka.algos.clustering.model.DataPoint;
-import org.yooreeka.algos.clustering.model.Dendrogram;
 import org.yooreeka.algos.clustering.utils.ObjectToIndexMapping;
 
 /** A hierarchical agglomerative clustering algorithm based on the average link */
@@ -41,7 +39,7 @@ public class AverageLinkAlgorithm {
 
 	public static void main(String[] args) {
 		// Define data
-		DataPoint[] elements = new DataPoint[5];
+		DataPoint[] elements = new DataPoint[5]; // number of keys e.g.,  64000
 		elements[0] = new DataPoint("A", new double[] {});
 		elements[1] = new DataPoint("B", new double[] {});
 		elements[2] = new DataPoint("C", new double[] {});
@@ -49,11 +47,13 @@ public class AverageLinkAlgorithm {
 		elements[4] = new DataPoint("E", new double[] {});
 
 		double[][] a = new double[][] { { 0, 1, 2, 2, 3 }, { 1, 0, 2, 4, 3 },
-				{ 2, 2, 0, 1, 5 }, { 2, 4, 1, 0, 3 }, { 3, 3, 5, 3, 0 } };
+				{ 2, 2, 0, 1, 5 }, { 2, 4, 1, 0, 3 }, { 3, 3, 5, 3, 0 } }; // values of each key should be 16 for each
 
 		AverageLinkAlgorithm ca = new AverageLinkAlgorithm(elements, a);
 		Dendrogram dnd = ca.cluster();
-		dnd.printAll();
+		//dnd.printAll();
+		dnd.print(1);
+		System.out.println("executed successfully");
 	}
 	private DataPoint[] elements;
 	private double[][] a;
@@ -79,7 +79,7 @@ public class AverageLinkAlgorithm {
 
 		dnd.addLevel(String.valueOf(d), allClusters.getAllClusters());
 
-		d = 1.0;
+		d = 0.01;
 
 		while (allClusters.size() > 1) {
 			int K = allClusters.size();

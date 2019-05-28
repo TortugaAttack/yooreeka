@@ -30,20 +30,14 @@
  */
 package org.yooreeka.util.internet.crawling;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.yooreeka.config.YooreekaConfigurator;
 import org.yooreeka.util.P;
 import org.yooreeka.util.internet.crawling.core.BasicWebCrawler;
 import org.yooreeka.util.internet.crawling.core.CrawlData;
-import org.yooreeka.util.internet.crawling.core.MyFileVisitor;
 import org.yooreeka.util.internet.crawling.core.URLFilter;
 import org.yooreeka.util.internet.crawling.core.URLNormalizer;
 
@@ -74,17 +68,9 @@ public class FetchAndProcessCrawler {
 
 	URLFilter urlFilter;
 
-	/**
-	 * This class fetches data from the Internet or local storage and processes them appropriately
-	 * so that they can be indexed and mined.
-	 * 
-	 * @param dir the directory where we want to store the data that will be retrieved
-	 * @param maxDepth the maximum traversal depth from the original page
-	 * @param maxDocs the maximum number of pages that will be fetched at each depth
-	 */
 	public FetchAndProcessCrawler(String dir, int maxDepth, int maxDocs) {
 
-		log.fine("Creating FetchAndProcessCrawler(String dir: "+dir
+		log.debug("Creating FetchAndProcessCrawler(String dir: "+dir
 				+", int maxDepth: "+maxDepth
 				+", int maxDocs: "+maxDocs+")");
 		
@@ -130,9 +116,9 @@ public class FetchAndProcessCrawler {
 	}
 
 	/**
-	 * @return the maximum depth of the crawl
+	 * @return the maxNumberOfCrawls
 	 */
-	public int getMaxDepth() {
+	public int getMaxNumberOfCrawls() {
 		return maxDepth;
 	}
 
@@ -166,7 +152,8 @@ public class FetchAndProcessCrawler {
 		/* run crawl */
 		webCrawler.fetchAndProcess(maxDepth, maxDocs);
 
-		P.println("Timer (s): [Crawler processed data] --> " + (System.currentTimeMillis() - t0) * 0.001);
+		P.println("Timer (s): [Crawler processed data] --> "
+				+ (System.currentTimeMillis() - t0) * 0.001);
 
 	}
 
@@ -213,7 +200,7 @@ public class FetchAndProcessCrawler {
 		setFilesOnlyUrlFilter();
 	}
 
-	public void setFilesOnlyUrlFilter() {
+	private void setFilesOnlyUrlFilter() {
 		/* configure url filter to accept only file:// urls */
 		URLFilter urlFilter = new URLFilter();
 		urlFilter.setAllowFileUrls(true);
@@ -322,11 +309,4 @@ public class FetchAndProcessCrawler {
 		}
 
 	}
-
-	public void setFilesDirectory(String dir) throws IOException, URISyntaxException {
-		
-		Path path = Paths.get(dir);
-		MyFileVisitor visitor = new MyFileVisitor();
-		Files.walkFileTree(path, visitor);
-	}	
 }

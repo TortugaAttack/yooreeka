@@ -33,14 +33,14 @@ package org.yooreeka.algos.search.lucene.analyzer;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.util.Version;
 
 /**
@@ -70,7 +70,7 @@ public class CustomAnalyzer extends StopwordAnalyzerBase {
 	private static CharArraySet MERGED_STOP_WORDS;
 
 	static {
-		MERGED_STOP_WORDS = new CharArraySet(Version.LUCENE_44,
+		MERGED_STOP_WORDS = new CharArraySet(
 				STOP_WORDS_SET.size() + ADDITIONAL_STOP_WORDS.length, true);
 	}
 
@@ -89,25 +89,24 @@ public class CustomAnalyzer extends StopwordAnalyzerBase {
 	 */
 	public CustomAnalyzer(Version matchVersion, CharArraySet stopWords) {
 
-		super(matchVersion, stopWords);
+		super(stopWords);
 	}
 
 	@Override
-	protected TokenStreamComponents createComponents(final String fieldName,
-			final Reader reader) {
+	protected TokenStreamComponents createComponents(final String fieldName) {
 
-		final StandardTokenizer src = new StandardTokenizer(matchVersion,
-				reader);
+		final StandardTokenizer src = new StandardTokenizer();
 		src.setMaxTokenLength(maxTokenLength);
-		TokenStream tok = new StandardFilter(matchVersion, src);
-		tok = new LowerCaseFilter(matchVersion, tok);
-		tok = new StopFilter(matchVersion, tok, stopwords);
+		TokenStream tok = new StandardFilter(src);
+		tok = new LowerCaseFilter(tok);
+		tok = new StopFilter(tok, stopwords);
 		return new TokenStreamComponents(src, tok) {
 			@Override
-			protected void setReader(final Reader reader) throws IOException {
+			protected void setReader(final Reader reader) {
 				src.setMaxTokenLength(CustomAnalyzer.this.maxTokenLength);
 				super.setReader(reader);
 			}
 		};
 	}
+
 }

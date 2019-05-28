@@ -49,27 +49,23 @@ import org.yooreeka.algos.search.lucene.LuceneIndexBuilder;
 import org.yooreeka.algos.search.ranking.Rank;
 import org.yooreeka.algos.taxis.bayesian.NaiveBayes;
 import org.yooreeka.algos.taxis.core.intf.Concept;
-import org.yooreeka.util.C;
 import org.yooreeka.util.P;
 import org.yooreeka.util.internet.behavior.UserClick;
 import org.yooreeka.util.internet.behavior.UserQuery;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
-
 public class MySearcher {
+
+	/**
+	 * An arbitrary small value
+	 */
+	public static final double EPSILON = 0.0001;
+
+	private static final String PRETTY_LINE = "_______________________________________________________________________";
 
 	private File indexFile;
 	private NaiveBayes learner = null;
-	
-	/**
-	 * The weights for the composite relevance score.
-	 * The values for these will depend on the formula and your normalization
-	 */
-	private double[] w = new double[3];
-	
+
 	private boolean verbose = true;
-	private boolean showTitle = false;
-	
 
 	public MySearcher(String indexDir) {
 		indexFile = new File(indexDir);
@@ -106,7 +102,7 @@ public class MySearcher {
 							"Document URL: %-46s  -->  Relevance Score: %.15f\n",
 							values[i].getUrl(), values[i].getScore());
 					if (printEntrySeparator) {
-						pw.printf(P.HLINE);
+						pw.printf(PRETTY_LINE);
 						pw.printf("\n");
 					}
 				} else {
@@ -115,10 +111,10 @@ public class MySearcher {
 				}
 			}
 			if (!printEntrySeparator) {
-				pw.print(P.HLINE);
+				pw.print(PRETTY_LINE);
 			}
 
-			P.println(sw.toString());
+			System.out.println(sw.toString());
 		}
 	}
 
@@ -130,7 +126,7 @@ public class MySearcher {
 
 		Directory dir = null;
 		try {
-			dir = FSDirectory.open(indexFile);
+			dir = FSDirectory.open(indexFile.toPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -143,7 +139,7 @@ public class MySearcher {
 			is = new IndexSearcher(dirReader);
 
 		} catch (IOException ioX) {
-			P.println("ERROR: " + ioX.getMessage());
+			System.out.println("ERROR: " + ioX.getMessage());
 		}
 
 		StandardQueryParser queryParserHelper = new StandardQueryParser();
@@ -182,8 +178,8 @@ public class MySearcher {
 			e.printStackTrace();
 		}
 
-		String header = P.HLINE+"\nSearch results using Lucene index scores:";
-
+		String header = "Search results using Lucene index scores:";
+		boolean showTitle = true;
 		printResults(header, "Query: " + query, docResults, showTitle);
 
 		return docResults;
@@ -229,7 +225,7 @@ public class MySearcher {
 		SearchResult.sortByScore(docResults);
 
 		String header = "Search results using combined Lucene scores and page rank scores:";
-
+		boolean showTitle = false;
 		printResults(header, "Query: " + query, docResults, showTitle);
 
 		return docResults;
@@ -257,7 +253,10 @@ public class MySearcher {
 	 */
 	public SearchResult[] search(UserQuery uQuery, int numberOfMatches, Rank pR) {
 
-		SearchResult[] docResults = search(uQuery.getQueryString(),	numberOfMatches);
+		SearchResult[] docResults = search(uQuery.getQueryString(),
+				numberOfMatches);
+
+		String url;
 
 		int docN = docResults.length;
 
@@ -266,6 +265,10 @@ public class MySearcher {
 			int loop = (docN < numberOfMatches) ? docN : numberOfMatches;
 
 			for (int i = 0; i < loop; i++) {
+
+				url = docResults[i].getUrl();
+
+				UserClick uClick = new UserClick(uQuery, url);
 
 				/**
 				 * TODO: 2.6 -- Weighing the scores to meet your needs (Book
@@ -283,38 +286,29 @@ public class MySearcher {
 				 * appropriate for your own site.
 				 * 
 				 */
-				
-				String docResultURL = docResults[i].getUrl();
-				
-				UserClick uClick = new UserClick(uQuery, docResultURL);
-
 				double indexScore = docResults[i].getScore();
 
-				
-				double pageRankScore = pR.getPageRank(docResultURL);
+				double pageRankScore = pR.getPageRank(url);
 
 				double userClickScore = 0.0;
-				
+
 				for (Concept bC : learner.getTset().getConceptSet()) {
-					
-					String bCN =  bC.getName();
-					
-					//DEBUG
-//					P.println("bCN: "+bCN);
-//					P.println(docResultURL);
-					
-					if (bCN.equalsIgnoreCase(docResultURL)) {
-						
+					if (bC.getName().equalsIgnoreCase(url)) {
 						userClickScore = learner.getProbability(bC, uClick);
 					}
 				}
 
 				// Create the final score
 				double hScore;
-		
-				hScore = w[0]*indexScore + 
-						 w[1]*pageRankScore + 
-						 w[2]*userClickScore;
+
+				if (userClickScore == 0) {
+
+					hScore = indexScore * pageRankScore * EPSILON;
+
+				} else {
+
+					hScore = indexScore * pageRankScore * userClickScore;
+				}
 
 				// Update the score of the results
 				docResults[i].setScore(hScore);
@@ -323,17 +317,18 @@ public class MySearcher {
 				 * Uncomment this block to show the various scores in the
 				 * BeanShell
 				 */ 
-				 StringBuilder b = new StringBuilder();
-				  
-				 b.append("Document      : ").append(docResultURL).append("\n");
-				 b.append("UserClick URL :").append(uClick.getUrl()).append("\n"); b.append("\n");
-				 b.append("Index score: ").append(indexScore).append(", ");
-				 b.append("PageRank score: ").append(pageRankScore).append(", ");
-				 b.append("User click score: ").append(userClickScore);
-				 
-				 P.hline();
-				 P.println(b.toString());
-				 P.hline();
+				
+//				 StringBuilder b = new StringBuilder();
+//				  
+//				 b.append("Document      : ").append(docResults[i].getUrl()).append("\n");
+//				 b.append("UserClick URL :").append(uClick.getUrl()).append("\n"); b.append("\n");
+//				 b.append("Index score: ").append(indexScore).append(", ");
+//				 b.append("PageRank score: ").append(pageRankScore).append(", ");
+//				 b.append("User click score: ").append(userClickScore);
+//				 
+//				 P.hline();
+//				 P.println(b.toString());
+//				 P.hline();
 			}
 		}
 
@@ -344,31 +339,11 @@ public class MySearcher {
 				+ "page rank scores and user clicks:";
 		String query = "Query: user=" + uQuery.getUid() + ", query text="
 				+ uQuery.getQueryString();
-
+		boolean showTitle = false;
 		printResults(header, query, docResults, showTitle);
 
 		return docResults;
 	}
-
-	/**
-	 * @return the w
-	 */
-	public double[] getW() {
-		return w;
-	}
-
-	public void setTfidfWeight(double v) {
-		w[0] = v;
-	}
-	
-	public void setPageRankWeight(double v) {
-		w[1] = v;
-	}
-	
-	public void setPersonalWeight(double v) {
-		w[2] = v;
-	}
-
 
 	public void setUserLearner(NaiveBayes nb) {
 		learner = nb;

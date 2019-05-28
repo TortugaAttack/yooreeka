@@ -59,8 +59,6 @@ public class FetchedDocsDB {
 	private Map<String, File> groupFiles = null;
 	private DocumentIdUtils docIdUtils = new DocumentIdUtils();
 
-	private boolean verbose=false;
-	
 	public FetchedDocsDB(File rootDirFile) {
 		this.rootDirFile = rootDirFile;
 	}
@@ -121,7 +119,7 @@ public class FetchedDocsDB {
 	private File getDocumentFile(String documentId, String ext) {
 		String groupId = docIdUtils.getDocumentGroupId(documentId);
 		File docDirFile = new File(rootDirFile, groupId);
-		String docFilename = DocumentIdUtils.getDocumentSequence(documentId) + ext;
+		String docFilename = docIdUtils.getDocumentSequence(documentId) + ext;
 		File docFile = new File(docDirFile, docFilename);
 		return docFile;
 	}
@@ -153,7 +151,7 @@ public class FetchedDocsDB {
 			for (File f : dataFiles) {
 				String name = f.getName();
 				String itemId = name.substring(0, name.indexOf("."));
-				String documentId = DocumentIdUtils.getDocumentId(groupId, itemId);
+				String documentId = docIdUtils.getDocumentId(groupId, itemId);
 				documentIds.add(documentId);
 			}
 		}
@@ -252,9 +250,7 @@ public class FetchedDocsDB {
 	}
 
 	private void saveContent(File f, byte[] content) {
-		if (verbose)
-			P.println("Writing file: "+f.getName());
-		
+		P.println("Writing file: "+f.getName());
 		try {
 			FileOutputStream fout = new FileOutputStream(f);
 			BufferedOutputStream bout = new BufferedOutputStream(fout);
@@ -268,8 +264,7 @@ public class FetchedDocsDB {
 
 	public void saveDocument(FetchedDocument doc) {
 		
-		if (verbose)
-			P.println("Saving fetched document with ID:"+doc.getDocumentId());
+		P.println("Saving fetched document with ID:"+doc.getDocumentId());
 		
 		/* create directory for current group if it doesn't exist yet. */
 		String groupId = docIdUtils.getDocumentGroupId(doc.getDocumentId());

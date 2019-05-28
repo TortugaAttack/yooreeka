@@ -55,8 +55,6 @@ public class KnownUrlDB {
 
 	private Map<String, KnownUrlEntry> unprocessedURLs = new HashMap<String, KnownUrlEntry>();
 
-	private boolean verbose = false;
-	
 	private File rootDir = null;
 	private File dbFile = null;
 
@@ -69,8 +67,7 @@ public class KnownUrlDB {
 
 	public boolean addNewUrl(String url, int depth) {
 		
-		if (verbose)
-			P.println("KnownUrlDB.addNewUrl("+url+", "+depth+")");
+		P.println("KnownUrlDB.addNewUrl("+url+", "+depth+")");
 
 		boolean isAdded = false;
 
@@ -214,8 +211,7 @@ public class KnownUrlDB {
 
 	private void loadUrl(String url, String status, int depth) {
 		
-		if (verbose)
-			P.println("KnownUrlDB.loadUrl("+url+", "+status+", "+depth+")");
+		P.println("KnownUrlDB.loadUrl("+url+", "+status+", "+depth+")");
 
 		if (isKnownUrl(url) == false) {
 			KnownUrlEntry r = new KnownUrlEntry();
@@ -256,8 +252,7 @@ public class KnownUrlDB {
 
 	public void updateUrlStatus(String url, String status) {
 		
-		if (verbose)
-			P.println("KnownUrlDB.updateUrlStatus("+url+", "+status+")");
+		P.println("KnownUrlDB.updateUrlStatus("+url+", "+status+")");
 
 		if (KnownUrlEntry.STATUS_PROCESSED_SUCCESS.equalsIgnoreCase(status) || 
 				KnownUrlEntry.STATUS_PROCESSED_ERROR.equalsIgnoreCase(status)) {

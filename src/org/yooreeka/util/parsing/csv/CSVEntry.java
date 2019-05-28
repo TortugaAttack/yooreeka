@@ -58,7 +58,7 @@ public class CSVEntry extends DataEntry {
 			setSeparator(sepChar);
 		}
 		
-		data = csvLine.trim().split(getSeparator());
+		data = csvLine.split(getSeparator());
 	}
 
 	public String getEntryAt(int i) {

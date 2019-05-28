@@ -65,7 +65,6 @@ public class BookmarkParser extends HTMLDocumentParser {
 	/**
 	 * @param args
 	 */
-	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		
 		String filename = args[0];
